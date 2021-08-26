@@ -7,21 +7,16 @@ import GlobalError from "../GlobalError";
 
 import {
     TextField, Button, InputAdornment, Tooltip,
-    TablePagination, Typography, Switch, Grid, Paper
+    TablePagination, Typography, Switch, Grid, Paper,
+    Card, Avatar, CardHeader, CardActionArea, CardActions,
+    CardContent, CardMedia
 } from '@material-ui/core';
-
-import Card from '@material-ui/core/Card';
-import Avatar from '@material-ui/core/Avatar';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 
 import Brightness5Icon from '@material-ui/icons/Brightness5';
 import Brightness4Icon from '@material-ui/icons/Brightness4';
 import { red } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
+
 const useStyles = makeStyles(theme => ({
     alignGifs: {
         display: "flex",
@@ -72,7 +67,7 @@ const SearchByGiphy = () => {
     const [loader, setLoader] = useState(false);
     const [snackbarShow, setSnackBar] = React.useState(false);
     const [currentPage, setCurrentPage] = useState(0);
-    const [rowPerPage, setRowPerPage] = useState(10);
+    const [rowPerPage, setRowPerPage] = useState(8);
     const [isDarkModeActive, setIsDarkModeActive] = useState(false);
 
     const handleSubmit = async () => {
@@ -106,7 +101,7 @@ const SearchByGiphy = () => {
                 {
                     gigphyData.slice(currentPage * rowPerPage, (currentPage + 1) * rowPerPage).map(el => {
                         return (
-                            <Grid item xs={12} sm={6} md={4} lg={3} >
+                            <Grid key={el.id} item xs={12} sm={6} md={4} lg={3} >
                                 <Card style={{
                                     background: isDarkModeActive && '#424242',
                                 }}>
@@ -139,23 +134,23 @@ const SearchByGiphy = () => {
                                             className={classes.media}
                                             image={el.images.fixed_height.url}
                                         />
-                                        <CardContent>
+                                        <CardContent style={{ minHeight: "100px" }}>
                                             <Typography style={{
                                                 color: isDarkModeActive && 'rgba(255, 255, 255, 0.7)'
                                             }}>
-                                                {el.user && el.user.description ? el.user.description : 'No description Available'}
+                                                {el.user && el.user.description ? el.user.description : 'No Description Available'}
                                             </Typography>
                                         </CardContent>
                                     </CardActionArea>
                                     <CardActions style={{
                                         padding: '5px 10px'
                                     }}>
-                                        <a href={el.url} target='_blank' style={{ textDecoration: 'none' }}>
+                                        <a href={el.url} target='_blank' rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                                             <Button size="small" color={isDarkModeActive ? "" : "primary"} variant='contained'>
                                                 View
                                             </Button>
                                         </a>
-                                        <a href={el.user && el.user.profile_url ? el.user.profile : ''} target='_blank' style={{ textDecoration: 'none' }}>
+                                        <a href={el.user && el.user.profile_url ? el.user.profile_url : '#'} target='_blank' rel="noopener noreferrer" style={{ pointerEvents: el.user && el.user.profile_url ? 'auto' : 'none', textDecoration: 'none' }}>
                                             <Button size="small" color={isDarkModeActive ? "" : "primary"} variant='contained'
                                                 disabled={
                                                     el.user && el.user.profile_url ? false : true
@@ -255,26 +250,30 @@ const SearchByGiphy = () => {
 
                 {
                     gigphyData && gigphyData.length ?
-                        <div style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                        }}>
-                            <TablePagination
-                                count={(gigphyData || []).length}
-                                onPageChange={(e, page) => { setCurrentPage(page) }}
-                                page={currentPage}
-                                rowsPerPage={rowPerPage}
-                                rowsPerPageOptions={[5, 10, 20, 50, 100]}
-                                onRowsPerPageChange={(e) => { setRowPerPage(e.target.value); setCurrentPage(0); }}
-                                labelRowsPerPage={'Gifs per page:'}
-                                classes={{
-                                    caption: isDarkModeActive && classes.tablePaginationCaption,
-                                    selectIcon: isDarkModeActive && classes.tablePaginationSelectIcon,
-                                    select: isDarkModeActive && classes.tablePaginationSelect,
-                                    actions: isDarkModeActive && classes.tablePaginationActions,
-                                }}
-                            />
-                        </div> : null
+                        <Grid
+                            container
+                            direction="row"
+                            justifyContent="flex-end"
+                            alignItems="center"
+                        >
+                            <Grid>
+                                <TablePagination
+                                    count={(gigphyData || []).length}
+                                    onPageChange={(e, page) => { setCurrentPage(page) }}
+                                    page={currentPage}
+                                    rowsPerPage={rowPerPage}
+                                    rowsPerPageOptions={[4, 8, 12, 16, 20]}
+                                    onRowsPerPageChange={(e) => { setRowPerPage(e.target.value); setCurrentPage(0); }}
+                                    labelRowsPerPage={'Gifs per page:'}
+                                    classes={{
+                                        caption: isDarkModeActive && classes.tablePaginationCaption,
+                                        selectIcon: isDarkModeActive && classes.tablePaginationSelectIcon,
+                                        select: isDarkModeActive && classes.tablePaginationSelect,
+                                        actions: isDarkModeActive && classes.tablePaginationActions,
+                                    }}
+                                />
+                            </Grid>
+                        </Grid> : null
                 }
 
                 {
