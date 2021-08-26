@@ -1,8 +1,9 @@
 import React from 'react';
 import {
-    AppBar, Toolbar, Tooltip, Typography,
+    AppBar, Toolbar, Typography, Button
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
 
 const Header = ({ Text, isDarkModeActive }) => {
     const useStyles = makeStyles((theme) => ({
@@ -30,14 +31,18 @@ const Header = ({ Text, isDarkModeActive }) => {
                     <Typography variant="h6" color="inherit" className={classes.title}>
                         Giphy
                     </Typography>
-                    <Tooltip title='Toogle light/dark theme' style={{
-                        fontSize: 16
+                    <Link to='/' style={{
+                        textDecoration: "none",
+                        color: "inherit"
                     }}>
-                        {Text}
-                    </Tooltip>
+                        <Button color="inherit">
+                            Home
+                        </Button>
+                    </Link>
+                    {Text}
                 </Toolbar>
             </AppBar>
-        </div>
+        </div >
     );
 }
 export default Header;

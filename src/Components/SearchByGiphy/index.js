@@ -6,8 +6,8 @@ import SimpleBackdrop from "../Loader";
 import GlobalError from "../GlobalError";
 
 import {
-    TextField, Button, InputAdornment, Paper,
-    TablePagination, Typography, Switch, Grid
+    TextField, Button, InputAdornment, Tooltip,
+    TablePagination, Typography, Switch, Grid, Paper
 } from '@material-ui/core';
 
 import Card from '@material-ui/core/Card';
@@ -20,7 +20,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 
 import Brightness5Icon from '@material-ui/icons/Brightness5';
 import Brightness4Icon from '@material-ui/icons/Brightness4';
-
+import { red } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 const useStyles = makeStyles(theme => ({
     alignGifs: {
@@ -58,6 +58,9 @@ const useStyles = makeStyles(theme => ({
     tablePaginationActions: {
         color: '#8ab4f8'
     },
+    avatar: {
+        backgroundColor: red[500],
+    },
 }));
 
 const SearchByGiphy = () => {
@@ -83,12 +86,19 @@ const SearchByGiphy = () => {
                     limit: 1000
                 }
             });
-            setGiphyData(result.data.data);
+            setGiphyData([...result.data.data]);
         } catch (err) {
             setError(true);
         }
         setLoader(false);
     };
+
+    const longDateFormat = (x) => {
+        let dateString = new Date(x);
+        let dateObject = dateString.toString();
+        let res = dateObject.slice(4, 15);
+        return res;
+    }
 
     const displayGifs = () => {
         return (
@@ -102,7 +112,7 @@ const SearchByGiphy = () => {
                                 }}>
                                     <CardHeader
                                         avatar={
-                                            <Avatar aria-label="recipe">
+                                            <Avatar aria-label="recipe" className={classes.avatar}>
                                                 {el.title.charAt(0).toUpperCase()}
                                             </Avatar>
                                         }
@@ -115,12 +125,11 @@ const SearchByGiphy = () => {
                                         }
                                         subheader={
                                             <Typography variant='body2' style={{
-                                                color: isDarkModeActive && 'rgba(255, 255, 255, 0.7)'
+                                                color: isDarkModeActive ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.54)'
                                             }}>
-                                                September 14, 2016
+                                                {longDateFormat(el.import_datetime)}
                                             </Typography>
                                         }
-
                                         style={{
                                             minHeight: '4vw'
                                         }}
@@ -130,15 +139,29 @@ const SearchByGiphy = () => {
                                             className={classes.media}
                                             image={el.images.fixed_height.url}
                                         />
-                                        {/* <CardContent>
-                                        </CardContent> */}
+                                        <CardContent>
+                                            <Typography style={{
+                                                color: isDarkModeActive && 'rgba(255, 255, 255, 0.7)'
+                                            }}>
+                                                {el.user && el.user.description ? el.user.description : 'No description Available'}
+                                            </Typography>
+                                        </CardContent>
                                     </CardActionArea>
                                     <CardActions style={{
-                                        padding: 16
+                                        padding: '5px 10px'
                                     }}>
-                                        <a href='https://giphy.com/shakingfoodgifs/' target='_blank' style={{ textDecoration: 'none' }}>
+                                        <a href={el.url} target='_blank' style={{ textDecoration: 'none' }}>
                                             <Button size="small" color={isDarkModeActive ? "" : "primary"} variant='contained'>
-                                                Profile
+                                                View
+                                            </Button>
+                                        </a>
+                                        <a href={el.user && el.user.profile_url ? el.user.profile : ''} target='_blank' style={{ textDecoration: 'none' }}>
+                                            <Button size="small" color={isDarkModeActive ? "" : "primary"} variant='contained'
+                                                disabled={
+                                                    el.user && el.user.profile_url ? false : true
+                                                }
+                                            >
+                                                {el.user && el.user.profile_url ? 'Profile' : 'No Profile'}
                                             </Button>
                                         </a>
                                     </CardActions>
@@ -164,15 +187,19 @@ const SearchByGiphy = () => {
             <GlobalError error={error} open={snackbarShow} />
             <Header
                 Text={
-                    <Switch
-                        color="default"
-                        checked={isDarkModeActive}
-                        onChange={(e) => {
-                            setIsDarkModeActive(e.target.checked)
-                        }}
-                        icon={<Brightness5Icon />}
-                        checkedIcon={<Brightness4Icon />}
-                    />
+                    <Tooltip title='Toogle light/dark theme' style={{
+                        fontSize: 16
+                    }}>
+                        <Switch
+                            color="default"
+                            checked={isDarkModeActive}
+                            onChange={(e) => {
+                                setIsDarkModeActive(e.target.checked)
+                            }}
+                            icon={<Brightness5Icon />}
+                            checkedIcon={<Brightness4Icon />}
+                        />
+                    </Tooltip>
                 }
                 isDarkModeActive={isDarkModeActive}
             />
@@ -252,13 +279,14 @@ const SearchByGiphy = () => {
 
                 {
                     gigphyData && gigphyData.length ?
-                        // <Paper style={{
-                        //     boxShadow: "none",
-                        //     background: '#F7F7FA 0% 0% no-repeat padding-box',
-                        // }}>
-                        <div className={classes.alignGifs}>
-                            {displayGifs()}
-                        </div>
+                        <Paper style={{
+                            boxShadow: "none",
+                            background: isDarkModeActive ? "#333" : '#F7F7FA 0% 0% no-repeat padding-box',
+                        }}>
+                            <div style={{ padding: "2vw" }}>
+                                {displayGifs()}
+                            </div>
+                        </Paper>
                         : null
                 }
             </div>
